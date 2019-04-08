@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "Comments", type: :request do
+
+
   before(:each) do
     @user = FactoryBot.create(:user)  #create the user
     @article = FactoryBot.create(:article) #create the article
@@ -25,10 +27,10 @@ RSpec.describe "Comments", type: :request do
   #Testing valid Index
   describe 'GET #index' do
      describe 'valid: ' do
-        it 'should return a list of comments' do
+        it 'should return a list of users' do
+
           @comment = FactoryBot.create(:comment, article: @article)
-          click_link 'comments'
-          save_and_open_page
+          click_link 'Comments'
           expect(current_path).to eq(comments_path)
           expect(page).to have_content(@comment.message)
         end
@@ -40,7 +42,7 @@ RSpec.describe "Comments", type: :request do
     describe 'valid: ' do
       it 'should return a comment' do
         @comment = FactoryBot.create(:comment, article: @article)
-        click_link 'comments'
+        click_link 'Comments'
         expect(current_path).to eq(comments_path)
         expect(page).to have_content(@comment.message)
 
@@ -52,7 +54,7 @@ RSpec.describe "Comments", type: :request do
     end
     describe 'invalid: ' do
       it 'should not return a comment if it doesn not exist' do
-        visti comment_parth(99999)
+        visit comment_path(99999)
         expect(current_path).to eq(comments_path)
         expect(page).to have_content("The comment you're looking for cannot be found")
       end
@@ -63,30 +65,33 @@ RSpec.describe "Comments", type: :request do
   describe 'GET #new' do
     describe 'valid: ' do
       it 'should create a new comment' do
-        click_link "comments"
+        click_link "Comments"
         expect(current_path).to eq(comments_path)
 
         click_link "New Comment"
         expect(current_path).to eq(new_comment_path)
         fill_in 'comment_message', with: 'New_Message'
         select @article.title, from: 'comment[article_id]'
-        click_button 'create comment'
+        select @user.email, from: 'comment[user_id]'
+        click_button 'Create Comment'
         expect(page).to have_content('Comment was successfully created')
-        expect(page).to have_content('New Message')
-        expect(page).to have_content('@user.email')
+        expect(page).to have_content('New_Message')
+        expect(page).to have_content(@article.title)
+        expect(page).to have_content(@user.email)
       end
     end
 
     describe 'invalid: ' do
       it 'should not create a new comment' do
-        click_link 'comments'
+        click_link 'Comments'
         expect(current_path).to eq(comments_path)
         click_link 'New Comment'
         expect(current_path).to eq(new_comment_path)
         fill_in 'comment_message', with: ''
         select @article.title, from: 'comment[article_id]'
+        select @user.email, from: 'comment[user_id]'
         click_button 'Create Comment'
-        expect(page).to have_content("Message can not be blank")
+        expect(page).to have_content("Message can't be blank")
       end
     end
   end
@@ -95,8 +100,8 @@ RSpec.describe "Comments", type: :request do
   describe 'GET #edit' do
     describe 'valid: ' do
       it 'should updatean comment with valid attributes' do
-        @comment = FactoryBot.create(:comment, aricle: @article)
-        click_link 'comments'
+        @comment = FactoryBot.create(:comment, article: @article)
+        click_link 'Comments'
         expect(current_path).to eq(comments_path)
         expect(page).to have_content(@comment.message)
 
@@ -148,9 +153,9 @@ RSpec.describe "Comments", type: :request do
   end
 
   # Testing Valid Destroy
-  describe 'GET #destroy' do
+  describe 'DELETE #destroy' do
     describe 'valid: ' do
-      it 'should destroy an comment' do
+      it 'should destroy a comment when destroy is clicked' do
         @comment = FactoryBot.create(:comment)
         click_link 'Comments'
         expect(current_path).to eq(comments_path)
@@ -163,10 +168,12 @@ RSpec.describe "Comments", type: :request do
     end
   end
 
-  describe "GET /comments" do
-    it "works! (now write some real specs)" do
-      get comments_path
-      expect(response).to have_http_status(200)
-    end
-  end
+  # describe "GET /comments" do
+  #   it "works! (now write some real specs)" do
+  #     save_and_open_page
+  #     get comments_path
+  #     expect(response).to have_http_status(200)
+  #   end
+  # end
+
 end
