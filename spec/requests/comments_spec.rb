@@ -28,6 +28,7 @@ RSpec.describe "Comments", type: :request do
         it 'should return a list of comments' do
           @comment = FactoryBot.create(:comment, article: @article)
           click_link 'comments'
+          save_and_open_page
           expect(current_path).to eq(comments_path)
           expect(page).to have_content(@comment.message)
         end
@@ -130,7 +131,7 @@ RSpec.describe "Comments", type: :request do
         expect(page).to have_content(@comment.message)
 
         click_link 'Show'
-        expect(current_path).to eq(comments_path(@comment))
+        expect(current_path).to eq(comment_path(@comment))
         expect(page).to have_content(@comment.message)
         expect(page).to have_content(@comment.article.title)
         expect(page).to have_content(@comment.user.email)
